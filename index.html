@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+
+<script>
+
+let lastPaymentId = null;
+
+function api(){
+    
+    var result;
+    if(arguments[0] == "POST"){
+    $.ajax({
+            url: "venda.php",
+            type: 'POST',
+            async: false,
+        }).done(function (data) {
+           result =data;
+        }).fail(function (jqXHR, textStatus, msg) {
+            alert(msg);
+        });
+    }
+    else if(arguments[0] == "GET" && lastPaymentId!=null){
+        $.ajax({
+            url: "consultaVenda.php",
+            type: 'POST',
+            data:{
+                paymentId: lastPaymentId
+            }, 
+            async: false,
+        }).done(function (data) {
+           result =data;
+        }).fail(function (jqXHR, textStatus, msg) {
+            alert(msg);
+        });
+    }
+    else{
+        alert("Nenhuma venda realizada");
+    }
+    result =JSON.parse(result);
+    lastPaymentId = result.Payment.PaymentId;
+
+    var nome=result.Customer.Name;
+    var montante=result.Payment.Amount;
+    var data = result.Payment.ReceivedDate;
+    var msg= result.Payment.ReturnMessage;
+    var tipo = result.Payment.Type;
+
+    var div = document.getElementById('textArea');
+    div.innerHTML += "<br> Cliente= "+nome+" &nbsp Data= "+data+"<br> Tipo de Pagamento: "+tipo+"  &nbsp Valor: "+montante+"<br> Mensagem Cielo: "+msg+"<br>";
+}
+
+</script>
+
+<html>
+<body>
+
+    <div class = "row" align = "center"> 
+        <h1> Tarefa Cielo </h1>
+        <div class = "row">
+            <div class="col-sm-6" align = "center">
+                <button class = "button" onclick = "api('POST') "> Realizar venda! </button>
+                <button class = "button" onclick = "api('GET')"> Consultar ultima venda </button>
+            </div>
+        </div>
+        <div id='textArea' align = 'center'>
+
+        </div>
+    </div>
+
+</body>
+
+<style>
+    .button {
+      background-color: rgb(37, 18, 214);
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
+    </style>
+</html>
+
+
